@@ -1,5 +1,9 @@
 \begin{foreignabstract}
 
-In this work, we present ...
+University Course Timetabling is a combinatorial optimization problem whose complexity grows significantly with the size of the institution, including the number of courses, instructors, students, and academic programs. This project addresses the assignment of course schedules while considering instructors' preferences over a predefined set of weekly time slots.
+
+The work builds upon research conducted over the past two years to solve this problem at the Faculty of Engineering of the University of Montevideo (FIUM), where an exact approach based on the Gurobi optimizer has been used to solve mixed-integer programming (MIP) formulations. While exact methods can guarantee optimal solutions, they often become computationally expensive as problem size increases. In contrast, heuristic approaches such as genetic algorithms, tabu search, and simulated annealing can provide high-quality near-optimal solutions within reasonable computational times, making them more suitable for large-scale instances.
+
+This project explores heuristic alternatives with the goal of improving both solution times and scalability. A comparison between exact and heuristic approaches is presented, together with a multi-objective analysis that evaluates trade-offs among course overlap, the use of exceptional time slots outside the standard schedule, and the number of days instructors are required to be present on campus each week.
 
 \end{foreignabstract}

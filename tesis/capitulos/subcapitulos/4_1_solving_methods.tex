@@ -1,0 +1,29 @@
+\section{Solving Methods}
+
+\subsection{Greedy}
+
+\subsection{Exact MIP Model}
+
+    \subsubsection{Weighted Sum}
+
+    \textit{Extraido del paper de CLEI 2026, Solution Methodology, Single-Objective MIP Approach}
+
+    % \green{justificación del solver exacto \\
+    
+    The problem formulation is coded using the Gurobi Python API and solved using the Gurobi MIP solver~\cite{gurobi}, which consists of advanced exact algorithms such as branch-and-bound, branch-and-cut, and cutting planes, combined with sophisticated presolve techniques that reduce model size before the main search begins. It also employs heuristics to quickly find high-quality feasible solutions.
+
+    The use of an exact approach is primarily justified by the need to obtain a solution guaranteed to satisfy all problem constraints. Moreover, it promotes transparency between the problem formulation and the resulting timetable, particularly in settings where multiple feasible solutions may exist. In this sense, the selected solution is guaranteed to be optimal with respect to the chosen objective weights.
+
+    The formulation makes use of logical constraints, such as the disjunctions defined in (\ref{cnst:def_x}), (\ref{cnst:def_y}), and (\ref{cnst:def_z}), as well as the explicit modeling of a minimum operator in (\ref{cnst:theo_prac}). These constructs can be handled directly by the Gurobi solver, together with the quadratic expressions that appear throughout the formulation.
+
+    % comentar etapa de presolve
+    The proposed formulation entails the creation of a large number of ``unnecessary'' variables. For instance, variables corresponding to professor-time-slot assignments in which the professor is unavailable are inevitably fixed to zero. This issue is handled by the solver during the presolve phase, where many redundant variables may be eliminated.
+  
+
+    \subsubsection{Lexicographic}
+
+    \subsubsection{AUGMECON}
+
+\subsection{Simulated Annealing}
+
+\subsection{Evolutionary Algorithms}

@@ -1,0 +1,30 @@
+\section{State of the Art}
+
+
+
+
+\textit{Extraido del paper de CLEI 2026, Related Work}
+
+% optimization methods/approach
+UCTTP is essentially a search problem~\cite{schaerf1999survey}, since the primary focus is to find a feasible assignment that complies with all imposed constraints rather than to optimize a desirability metric over scheduled time-slots.
+    
+Another optimization approach to the problem is to categorize the constraints as hard constraints (HC) and soft constraints (SC). Then, the objective is to minimize violations of the soft constraints (SC), while ensuring that all hard constraints (HC) are satisfied. This approach is implemented in~\cite{algethami2021}. This naturally leads to a multiobjective approach when multiple soft constraints are present, as it becomes necessary to balance the satisfaction of different conditions that may, at times, be mutually conflicting.
+
+
+    % \green{Different multi-objective approaches}
+
+The most common way to address multiple objectives is through a weighted-sum approach, in which the different objectives are aggregated into a single objective function by assigning a weight to each one according to its relative importance see~\cite{hisyam2024implementation} for instance. This approach leads to a single-objective formulation, although the weights can vary to better explore the solution space.
+
+Alternative exact and heuristic methods have also been proposed with the aim of approximating the Pareto front. In particular,~\cite{datta2007multi} employs the NSGA-II genetic algorithm to minimize (a) student idle hours and (b) the number of consecutively taught courses for professors. Meanwhile,~\cite{davison2025modelling} adopts an exact lexicographic approach and studies all possible hierarchical orderings of three objectives related to student demand: (a) elective courses demand, (b) virtual or in-person preference, and (c) schedule overlaps for each student. An alternative exact approach is the $\epsilon$-constraint method, which optimizes one objective while imposing bounds on the others through additional constraints, enabling the systematic exploration of Pareto-optimal trade-offs~\cite{mokhtari2021developing}.
+
+    % \green{Optimization methods for UCTTP}
+
+Within the single-objective framework, the most prominent algorithm in the state of the art is Simulated Annealing (SA), which has achieved some of the best results on several standard benchmark instances~\cite{ceschia2012design}. Even in a multiobjective context, a multiobjective variant of this algorithm (MOSA) has been explored in~\cite{akkan2022bi}. In that work, two objectives are minimized: (i) a weighted sum of soft constraint violations, and (ii) a stochastic measure of solution robustness, intended to produce schedules capable of accommodating subsequent modifications.
+
+Our approach also integrates the assignment of professors to lectures. In the existing literature, this variant of the problem is commonly addressed through a two-stage process: first assigning teachers to courses, and subsequently scheduling the courses~\cite{chavez2020modeling,gunawan2012hybridized}. In contrast, we incorporate professor assignments directly into the course scheduling process, following the approach proposed in~\cite{arratia2021university}.
+
+An alternative modeling approach considers individual students rather than groups, yielding an integer conflict matrix in which each entry represents the number of students shared by a pair of lectures~\cite{tripathy1992computerised}.
+% However, this information may also be incorporated into the objective function, with the aim of minimizing the total number of student conflicts arising from lectures scheduled in the same time slot.
+
+% A remarkable characteristic of our formulation is the partitioning of days and teaching hours into time-slots. We consider atomic time-slots while allowing variable lecture durations through the concatenation of consecutive slots. 
+In the current work, we define schedule shifts as clusters of time slots corresponding to different periods of the day. A related approach to time-slot clustering is presented in~\cite{arratia2021university}.

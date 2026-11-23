@@ -1,0 +1,38 @@
+\section{Taxonomy of the University Course Timetabling Problem}
+
+
+
+\textit{Extraido del paper de CLEI 2026, Background}
+
+This section introduces the University Course Timetabling Problem (UCTTP) and reviews its main formulations and variants. It also surveys relevant literature and optimization approaches commonly employed to address feasibility, objective function aspects of timetabling problems.
+
+    \subsection{University Course Timetabling Problem (UCTTP)}\label{sec:UCTTP_definition}
+
+    % Revision bibliografica, estandares del problema
+
+    The literature on educational timetabling mainly addresses the School Timetabling Problem (STP), the University Course Timetabling Problem (UCTTP), and the Examination Timetabling Problem~\cite{babaei2015survey}. This work focuses on the UCTTP, which differs from the STP in that courses may have students in common, while STP students are organized into disjoint groups~\cite{schaerf1999survey}.
+
+
+
+    A formal definition of the UCTTP includes a set of courses —each consisting of a fixed number of teaching hours— a set of classes (groups of students sharing the same curriculum, i.e., the same list of courses), and a set of time-slots. The constraints enforce the required number of lectures for each course, prevent lectures belonging to the same class from being scheduled simultaneously, and limit the number of concurrent lectures, for instance, due to room availability.
+    
+    An alternative formulation also introduces a set of professors, together with the constraint that each course is assigned to a single professor. The objective function aims to minimize the total cost associated with the selected time slots, where costs represent the desirability of scheduling a given course in a particular time slot~\cite{dewerra1985introduction}.
+
+    % While standard UCTTP involves assigning courses to time slots and classrooms, this work focuses on professor assignment, while maintaining the fundamental structure of assigning two elements—professors and time slots—to each course.
+    
+    The UCTTP has been studied through the lens of graph coloring theory, which involves assigning colors to vertices such that adjacent vertices receive different colors while minimizing the total number of colors used~\cite{dewerra1985introduction,burke}. Within this framework, courses are represented as nodes, conflicts and constraints between courses correspond to edges, and available time-slots are modeled as colors. This representation allows the timetabling problem to be classified as an NP-hard one, since determining the chromatic number of an arbitrary graph is itself an NP-hard problem~\cite{babaei2015survey}.
+
+    Solution quality is evaluated using professors’ time-slot preferences, analogously to the UCTTP standard definition, with costs induced by professor-defined preferences. Moreover, this approach accounts for unavailable periods explicitly requested by professors. The objective function is similarly addressed in~\cite{chen}.
+    
+    %    There are two main approaches to the UCTTP depending on the state of student enrolment at the time the problem is solved: post-enrolment course timetabling (PE-CTT) and curriculum-based course timetabling (CB-CTT). As their names suggest, the former constructs the timetable based on predefined curricula for each degree program, before the enrolment period begins. In contrast, the latter addresses the problem using complete information about individual student enrolments in courses~\cite{ceschia2012design}.
+    
+    Two principal variants of the University Course Timetabling Problem (UCTTP) can be distinguished according to the availability of student enrolment information at the time of solution: post-enrolment course timetabling (PE-CTT) and curriculum-based course timetabling (CB-CTT). %Despite the nomenclature, 
+    PE-CTT relies on detailed information about individual student enrolments, whereas CB-CTT is constructed from predefined curricula for each degree program \emph{prior} to the enrolment period~\cite{ceschia2012design}.
+
+    The formal definition of the PE-CTT presented in~\cite{ceschia2012design} explicitly incorporates the enrolment relationship between students and courses, thereby imposing that lectures sharing common students cannot be scheduled simultaneously. Beyond this, the formulation provides a detailed treatment of room assignment, considering both room capacities and available resources. It also accounts for time-slot unavailability for lectures and introduces precedence constraints, specifying a required teaching order among lectures.
+    
+    By contrast, the CB-CTT formulation ---\textit{pre}-enrolment timetabling---, as described in~\cite{akkan2022bi}, models conflicts between simultaneous lectures based on predefined curricula rather than individual student enrolments. This approach likewise considers time-slot (un)availability and room capacity constraints. However, the characteristics of CB-CTT require particular attention to changes that may arise after timetable publication. To address this issue,~\cite{akkan2022bi} introduces a robustness measure for each solution, aiming to anticipate and limit the number of future adjustments required.
+    
+    In the case study context, the timetable is established prior to the enrolment period, and almost no change is made afterward as a result of student enrolment. For this reason, a PE‑CTT perspective is adopted, but seen from the point of view of student groups. Instead of explicitly modeling individual students, groups are defined according to degree program, academic year, major, partition—when a group is split due to a large number of students—and schedule shift. Hence, the \textit{post}‑enrolment approach reflects the predefined relationships between student groups and the lectures they attend.
+    
+    

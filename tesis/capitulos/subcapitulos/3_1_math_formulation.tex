@@ -1,0 +1,443 @@
+\section{Mathematical Formulation and Variants}
+
+\textit{Extraido del paper de CLEI 2026, Problem Description}
+
+
+\subsection{Case Study}
+
+The proposed formulation is tailored to the specific conditions and requirements of the FIUM context. As it is an institution of relatively small size, the aim is to respect, in a personalized manner, the preference and time availability of each professor.
+
+
+In the present work, elective courses are introduced, namely, non-mandatory courses chosen by students from different grades~\cite{kristiansen2011elective}. Between elective courses, the overlap restriction is considered a soft constraint in the objective function, while it is maintained as a hard constraint between a mandatory course and an elective one, and between pairs of mandatory courses.
+
+In practice, the use of grid-based preference scoring alone does not adequately capture professors' true priorities. To overcome this issue, special conditions are now introduced in the system as \textit{ad-hoc} constraints. These include professor-related conditions, such as enforcing minimum rest time between lectures, as well as general scheduling conditions, such as limiting the use of early time-slots and preventing the simultaneous assignment of morning and afternoon shifts on the same day.
+
+
+%\green{Post-Enrolment Student Grouping}   
+In this context, timetables are decided \textit{before} the enrolment period. Since the enrolment of students in courses is restricted by their major curricula, course enrolment is therefore specified on group level, and pairs of courses sharing at least one group are not allowed to overlap in time. The different groups are determined by degree program, academic year, shift, or subdivision (when a group is divided into subgroups due to a high estimated number of students).
+
+
+% Finally, courses are allowed to have variable durations, both within a single day and across multiple days of the week, subject to feasibility constraints.
+
+
+The timetable assignment resulting from the model is used throughout the entire semester (15 weeks). Classroom assignment is carried out later and manually, since it can be dynamically adjusted week by week as issues arise.
+
+
+
+    % \textit{Institutional policies and stakeholders}
+
+% incluir proceso de aceptar horarios excepcionales y luego el pasaje a formalizarlo como una soft constraint del modelo:
+During the initial applications of the method, it became clear that the predefined time‑slot grid was too restrictive to accommodate all curricular requirements, often leaving only one or two free slots per week. As a result, exceptional time slots allowing slight shift overflow were frequently needed to obtain feasible schedules.
+    
+Since the original model did not include such exceptional slots, a temporary workaround was implemented by adapting the problem instances. Selected courses had their weekly load reduced, with the remaining hours manually incorporated after solving. This experience led to a refinement of the model in which overflow time slots were explicitly modeled as a soft constraint, with their use penalized in the objective function.
+    
+
+
+\subsection{Mathematical Formulation}
+
+% Some definitions need to be done before starting with the formulation. 
+
+What is generally known as a subject will be referred to as a \textit{course}, such as ``Programming I'' or ``Calculus III”. Each course consists of one or more \textit{lectures}, understood as the specific instances in which the course is taught during a semester. For example, two lectures of ``Programming I'' may be offered during the same semester, taught by different professors and attended by different groups of students. Each lecture is associated with a fixed number of teaching hours per week.
+
+To assign lecture hours, the week is partitioned into days, and each day is further divided into discrete \textit{timeslots} (e.g., 08:00–08:50, 08:50–09:40). We define a \textit{timeblock} as a pair of day and timeslot.
+
+Each group has an associated curriculum of courses, some of which are elective. Pairs of lectures that share at least one group of students cannot overlap in their schedules. However, there are elective lectures that may partially overlap, allowing a student to choose between them. A compulsory lecture and an elective lecture that share a group cannot overlap. Furthermore, the case of half-semester lectures is covered, allowing overlap ---even if the same professor teaches both lectures--- between pairs where one lecture is taught at the beginning and the other at the end of the semester.
+
+
+% Time blocks are predefined; they consist of a day–time pair and are grouped into shifts. Each course has an assigned weekly teaching load, which must be covered with consecutive time blocks within the same day and distributed across the number of days per week on which the course is taught. In addition, each course has an assigned set of instructors authorized to teach it.
+
+Each lecture is linked to a predefined set of professors determined by subject‑matter expertise. In cases where this list contains a single professor, the assignment is effectively fixed in advance.
+
+
+
+% In addition to time preferences, the aim is to minimize the number of teaching days per week for professors who so wish; to minimize the use of exceptional time slots; and to minimize schedule overlap among elective courses.
+
+Next, the mathematical formulation is detailed.
+
+
+    % \green{Table of symbols}
+        
+    \subsubsection{Primary Sets}
+
+        \begin{itemize}
+            \item $\courses$: courses.
+            %set of courses that represent the different subjects offered by the university.
+            \item $\lectures$: lectures.
+            \item $\days$: days of the week (ordered set).
+            \item $\timeslots$: time-slots of a day (ordered set).
+            \item $\timeblocks := \{(d,t): \ d\in\days, t\in\timeslots\}$: timeblocks (day, time-slot) of a week.
+            \item $\shifts$: schedule shifts.
+            \item $\groups$: student groups.
+            \item $\profs$: professors.
+            \item $\electives \subset \lectures$: elective lectures.
+        \end{itemize}
+
+
+        % (implicito en la definicion)
+        % In the set of days and the set of timeslots the order between elements is well-defined. For instance, day $d$ is followed by day $d+1$, and timeslot $t$ is preceded by timeslot $t-1$.
+
+
+    \newcommand{\excepTimes}{\timeslots^\text{E}}
+    
+    \subsubsection{Derived Sets}    
+        \begin{itemize}
+            % \newcommand{\lecturesCourse}{\lectures_c}
+            % \item $\lecturesCourse \subset \lectures$: set of lectures of course $c\in\courses$.
+            \item $\lectures_c \subset \lectures$: lectures of course $c\in\courses$.
+            \item $\timeslots_s \subset \timeslots$: time-slots of schedule shift $s\in\shifts$.
+            \item $\excepTimes_s \subset \timeslots_s$: time-slots that are exceptional for the schedule shift $s\in\shifts$.
+            \item $s_g \in S$: schedule shift of group $g\in\groups$.
+            \item $\groups_l \subseteq \groups$: student groups involved in lecture $l\in\lectures$.
+            \item $\lectures_g \subseteq \lectures$: lectures where group $g\in\groups$ is enrolled.
+            \item $\timeslots_l \subset \timeslots$: time-slots where lecture $l\in\lectures$ can be assigned, which are determined by the intersection of the time-slots from the shifts associated with the groups involved in the lecture.
+            \begin{equation}
+                \timeslots_l = \bigcap_{s\in\shifts_l} {\timeslots_s} \ , \text{ where } \ \shifts_l =\{s_g, \ g\in\groups_l\}
+                \nonumber
+            \end{equation}
+            \item $\excepTimes_l \subset \timeslots_l$: exceptional time-slots for lecture $l\in\lectures$, considered as time-slots that are exceptional for any of the shifts of enrolled groups.
+            \begin{equation}
+                \excepTimes_l = \timeslots_l \cap \left\{ \bigcup_{s\in\shifts_l}{\excepTimes_s} \right\}
+                \nonumber
+            \end{equation}
+            \item $\profs_l\subset \profs$: professors that can be assigned to lecture $l\in\lectures$.
+            \item $\courses_p \subset \courses$: courses whose lectures are taught by professor $p\in\profs$.
+            \item $\lectures^\text{CD}\subset\lectures$: lectures that can be scheduled on consecutive days. This set includes the elective lectures: $\electives\subset\lectures^\text{CD}$.
+            \item $\profs^\text{D}\subset\profs$: professors requesting to minimize weekly teaching days.
+            \item $\profs^\text{SL}\subset\profs$: professors allowed up to two simultaneous lectures.
+            \item $\lectures^\text{TP}\subset \lectures \times \lectures$: pairs  $(t,p)$ of related theoretical lecture $t$ and practical lecture $p$.
+            \item $\lectures^\text{P}$: practical lectures.
+            \begin{equation}
+                \lectures^\text{P} = \{p \in \lectures | \ \exists t \in\lectures: (t,p)\in \lectures^\text{TP} \}
+                \nonumber
+            \end{equation}
+        \end{itemize}
+
+   % For each course $c$, their lectures can be elective or not depending on the groups involved.
+
+    
+
+    % \begin{equation}
+    %     \lectures = \bigsqcup_{c\in\courses} {\lectures_c}
+    %     \nonumber
+    % \end{equation}
+
+    % \begin{equation}
+    %     \lectures_p \subset \bigcup_{c\in\courses_p} {\lectures_c} \ , \quad \lectures_p:=\{l\in\lectures: p\in\profs_l\}
+    % \end{equation}
+
+
+
+
+    
+    
+
+    
+    \subsubsection{Parameters}
+
+    \newcommand{\overlap}[2]{\Omega_{#1,#2}}
+    \newcommand{\maxHours}[1]{\overline{H}_{#1}}
+    \newcommand{\minHours}[1]{\underline{H}_{#1}}
+    \newcommand{\preference}{\Pi}
+    \newcommand{\unav}{\Pi^0}
+    \newcommand{\numLectures}{\overline{L}}
+    \newcommand{\numProfs}{\overline{P}}
+    
+        \begin{itemize}
+            \item $\overlap{l_1}{l_2} \in \mathbb{B}$: if temporal overlap is forbidden between lectures $l_1$ and $l_2$ $\in \lectures$.
+            \begin{equation}
+                \begin{split}
+                    \overlap{l_1}{l_2}=1 \iff & l_1\neq l_2, \ \groups_{l_1} \cap \groups_{l_2} \neq \varnothing, \\                              & \text{unless otherwise stated}
+                \end{split}
+                \label{eq:overlap_condition}
+            \end{equation}
+            \item $\overlap{l_1}{l_2}^\electives \in \mathbb{B}$: if temporal overlap is penalized between elective lectures $l_1$ and $l_2$ $\in \electives$.
+            \item $H_l \in \mathbb{N}$: number of weekly time-slots of lecture $l\in\lectures$.
+            \item $D_l \in \mathbb{N}$: number of days of the week when lecture $l\in\lectures$ is taught.
+            \item $\maxHours{l}, \minHours{l} \in \mathbb{N}$: upper and lower bounds of daily teaching time-slots of lecture $l\in\lectures$.
+            \begin{equation}
+                \maxHours{l} := \left\lceil \frac{H_l}{D_l} \right\rceil  \ , \quad \minHours{l} :=  \left\lfloor \frac{H_l}{D_l} \right\rfloor
+                \nonumber
+            \end{equation}
+            \item $\preference_{p,b} \in \{0,1,2,3\}$: preference of professor $p\in\profs$ over timeblock $b\in\timeblocks$. The lower the value, the higher the preference; while zero implies impossibility.
+            \item $\unav_{p,b} \in \mathbb{B}$: unavailability of professor $p\in\profs$ in the timeblock $b\in\timeblocks$. $\unav_{p,b}=1 \iff \preference_{p,b}=0$.
+            \item $\numLectures_{c,p} \in \mathbb{N}$: number of lectures of course $c\in\courses_p$ that have to be assigned to professor $p\in\profs$.
+            \item $\numProfs_{l} \in \mathbb{N}$: number of professors that have to be assigned to lecture $l\in\lectures$.
+            \item $R\in\mathbb{N}$: number of available rooms for hosting the lectures.
+            \item $i_b\in\{1,\dots,|\timeblocks|\}$: index assigned to timeblock $b\in\timeblocks$ to show the cronological order between them during a week.
+        \end{itemize}
+
+    The overlap parameter is defined as $\overlap{l_1}{l_2}=1$ if lectures $l_1$ and $l_2$ cannot be taught simultaneously. In general, the non-overlap condition is set between lectures that have a group in common —see equation (\ref{eq:overlap_condition})— so the students of that group need to attend both lectures. Some exceptions apply, for example if $l_1$ and $l_2$ are both elective lectures then $\overlap{l_1}{l_2}:=0$, but the overlap between them is penalized by setting $\overlap{l_1}{l_2}^\electives:=1$.
+
+
+
+
+    \vspace{1em}
+
+    \subsubsection{Decision Variables}
+
+    The main variables that define a solution are:
+    \begin{itemize}
+        \item $u_{l,b}\in\mathbb{B}$ indicates whether lecture $l\in\lectures$ is assigned to timeblock $b\in\timeblocks$.
+        \item $w_{l,p}\in\mathbb{B}$ indicates indicating whether professor $p\in\profs$ is assigned to lecture $l\in\lectures$.
+    \end{itemize}
+
+    Moreover, secondary variables are defined as follows:
+    \begin{itemize}
+        \item $v_{l,d}\in\mathbb{B}$ indicates whether lecture $l\in\lectures$ is scheduled in day $d\in\days$.
+        \item $x_{g,b}\in\mathbb{B}$ indicates whether group $g\in\groups$ has a lecture scheduled in timeblock $b\in\timeblocks$.
+        \item $y_{p,b}$ indicates whether professor $p\in\profs$ has to teach a lecture in timeblock $b\in\timeblocks$.
+        \item $z_{p,d}$ indicates whether professor $p\in\profs$ has to teach a lecture during day $d\in\days$.
+    \end{itemize}
+
+    The collection of all  variables is denoted $\xi:=(u,v,w,x,y,z)\in\mathbb{B}^n$, where $n$ is the total number of variables.
+        
+    
+
+\subsubsection{Constraints}
+
+The formulation constraints can be classified according to their nature and degree of obligation, although all must be strictly met for the model presented here.
+
+On the one hand, there are basic constraints to ensure that the formulation makes sense. First, the constraints on the time distribution of each lecture ensure that the weekly teaching workload of the lecture is covered (\ref{cnst:lecture_workload}), spreading this workload across the specified number of days per week (\ref{cnst:lecture_num_days}), setting upper and lower bounds on the number of time-slots per day (\ref{cnst:max_min_hours}), and making these time-slots consecutive during each day (\ref{cnst:consecutive_hours}), in order to distribute the teaching load evenly. For example, if a lecture has 5 time-slots per week and should be taught in 2 days, these constraints assure that the time-slots will be scheduled as 3 consecutive time-slots in one day and 2 consecutive time-slots in another day. 
+
+\begin{equation}
+    \sum_{b\in\timeblocks} u_{l,b} = H_l \ , \quad \forall l \in \lectures
+    \label{cnst:lecture_workload}
+\end{equation}
+\begin{equation}
+    \sum_{d\in\days} v_{l,d} = D_l \ , \quad \forall l \in \lectures
+    \label{cnst:lecture_num_days}
+\end{equation}
+\begin{equation}
+    \minHours{l} \cdot v_{l,d} \leq \sum_{t\in\timeslots} u_{l,(d,t)} \leq \maxHours{l} \cdot v_{l,d} \ , \quad \forall l \in \lectures, \ d\in\days
+    \label{cnst:max_min_hours}
+\end{equation}
+\begin{equation}
+    \begin{split}
+        \sum_{t\in\timeslots} u_{l,(d,t)} - \sum_{t:\{t,t+1\}\subset\timeslots} u_{l,(d,t)} \cdot u_{l,(d,t+1)} = v_{l,d} \\
+        \quad \forall d\in\days, \ l \in \lectures
+    \end{split}
+    \label{cnst:consecutive_hours}
+\end{equation}
+
+Additionally, constraint (\ref{cnst:lecture_shifts}) restricts the assignment of lecture time-slots to the shift corresponding to the groups involved in that lecture, and constraint (\ref{cnst:overlap}) avoids schedule overlaps between courses that share some group, except in the case of pairs of elective courses, as defined with the $\Omega$ parameter.
+\begin{equation}
+    \sum_{d\in\days} \sum_{t\in \timeslots\setminus\timeslots_l} u_{l,(d,t)} = 0  \ , \quad \forall l \in \lectures
+    \label{cnst:lecture_shifts}
+\end{equation}
+
+\begin{equation}
+    \sum_{l_1\in\lectures} \sum_{l_2\in\lectures}\sum_{b\in\timeblocks} \overlap{l_1}{l_2} \cdot u_{l_1,b} \cdot u_{l_2,b} = 0
+    \label{cnst:overlap}
+\end{equation}
+
+Secondly, the constraints related to professor-lecture pairings ---$w$ variables--- restrict the assignment of each professor to the lectures for which they are qualified (\ref{cnst:profs_list}), ensure that each lecture is assigned the required number of professors (\ref{cnst:num_profs}) ---some courses may have multiple responsible professors---, cover the predetermined number of lectures that must be assigned to each professor for each course they teach (\ref{cnst:num_lectures}) ---there may be multiple lectures of the same course, represented as $\lectures_c$---.
+\begin{equation}
+    \sum_{p\in\profs\setminus\profs_l} w_{l,p} = 0 \ , \quad \forall l\in\lectures
+    \label{cnst:profs_list}
+\end{equation}
+\begin{equation}
+    \sum_{p\in\profs} w_{l,p} = \numProfs_l \ , \quad \forall l\in\lectures
+    \label{cnst:num_profs}
+\end{equation}
+\begin{equation}
+    \sum_{l\in\lectures_c} w_{l,p} = \numLectures_{c,p} \ , \quad \forall c\in\courses_p, \ p \in \profs
+    \label{cnst:num_lectures}
+\end{equation}
+
+Thirdly, professor time-block schedules are governed by constraint (\ref{cnst:not_simult_lectures}), which prevents professors from teaching lectures that overlap in time, except in specific, explicitly defined situations where up to two simultaneous lectures are permitted —for instance, for pairs of lectures that run only half a semester— and by constraint (\ref{cnst:unav_prof}), which disallows assigning time-blocks to professors during periods when they are unavailable (preference $=0$).
+ \begin{equation}
+ \begin{split}
+    &\sum_{l\in\lectures} w_{l,p} \cdot u_{l,b} \leq 1 \ , \quad \forall b\in\timeblocks, \ p \in \profs\setminus\profs^\text{SL} \\
+    &\sum_{l\in\lectures} w_{l,p} \cdot u_{l,b} \leq 2 \ , \quad \forall b\in\timeblocks, \ p \in \profs^\text{SL}
+ \end{split}
+    \label{cnst:not_simult_lectures}
+\end{equation}
+\begin{equation}
+    \sum_{l\in\lectures} \sum_{b \in \timeblocks} \unav_{p,b} \cdot w_{l,p} \cdot u_{l,b} = 0 \ , \quad \forall p\in\profs\
+    \label{cnst:unav_prof}
+\end{equation}
+
+Fourthly, some non-linear, logical constraints are established to ensure consistency between primary and secondary variables. In the case of occupied timeblocks for each group, constraint (\ref{cnst:def_x}) defines the $x$ variables based on the schedule of non-elective lectures involving that group. Constraint (\ref{cnst:def_y}) define the professor-timeblock $y$ variables depending on professor-lecture and lecture-timeblock assignments. Then, the professor-day $z$ variables are set with constraint (\ref{cnst:def_z}) based on $y$ variables.
+Particularly for $v$ variables ---day-lecture assignments---, no additional constraint is needed, as the previous (\ref{cnst:max_min_hours}) constraint already suffices to define them as the disjunction $v_{l,d}=\bigvee_{t \in T} u_{l,(d,t)}$, meaning that the $v_{l,d}$ variable is activated when the lecture $l$ has at least one time-slot scheduled at day $d$.
+
+\begin{equation}
+    x_{g,b} = \bigvee_{l\in\lectures_g\setminus\electives} u_{l,b} \ , \quad \forall b \in \timeblocks, \ g\in\groups
+    \label{cnst:def_x}
+\end{equation}
+
+\begin{equation}
+    y_{p,b} = \bigvee_{l \in L} w_{l,p} \cdot u_{l,b} \ , \quad \forall b\in\timeblocks, \ p \in \profs
+    \label{cnst:def_y}
+\end{equation}
+
+\begin{equation}
+    z_{p,d} = \bigvee_{t\in\timeslots} y_{p,(d,t)} \ , \quad \forall d\in\days, \ p \in \profs
+    \label{cnst:def_z}
+\end{equation}
+
+On the other hand, in the evaluated case study, some particular constraints are added. Constraint (\ref{cnst:consecutive_days}) avoids scheduling lectures on consecutive days, unless otherwise specified. Constraint (\ref{cnst:theo_prac}) establishes a precedence relation between practical and theoretical lectures: a practical lecture must be preceded during the week by at least one time-slot of the corresponding theoretical lecture, allowing both to occur on the same day. Constraint (\ref{cnst:consecutive_group_hours}) avoids idle time or \textit{bridge time} between lectures for student groups, that is, class time-slots must be consecutive within the same day for each group. Regarding available rooms, constraint (\ref{cnst:rooms}) limits the number of simultaneous lectures to the number of available rooms.
+
+
+\begin{equation}
+    \sum_{d:\{d,d+1\}\subset D} v_{l,d} \cdot v_{l,d+1} = 0 \ , \quad \forall l \in \lectures \setminus \lectures^\text{CD}
+    \label{cnst:consecutive_days}
+\end{equation}
+
+\begin{equation}
+    \min_{b\in\timeblocks} \{i_b \cdot u_{t,b} \} < \min_{b\in\timeblocks} \{i_b \cdot u_{p,b}\} \ , \quad \forall (t,p) \in \lectures^\text{TP}
+    \label{cnst:theo_prac}
+\end{equation}
+
+\begin{equation}
+    \begin{split}
+        \sum_{t\in\timeslots} x_{g,(d,t)} - \sum_{t:\{t,t+1\}\subset\timeslots} x_{g,(d,t)} \cdot x_{g,(d,t+1)} \leq 1 \\
+        \quad \forall d \in \days, \ g\in\groups
+    \end{split}
+    \label{cnst:consecutive_group_hours}
+\end{equation}
+
+\begin{equation}
+    \sum_{l\in\lectures} u_{l,b} \leq R \ , \quad \forall b\in\timeblocks
+    \label{cnst:rooms}
+\end{equation}
+
+Finally, customized constraints are added to address particular conditions for specific lectures and professors. To express these general constraints, referred to as \textit{ad-hoc} constraints, equation (\ref{cnst:ad_hoc}) represents how a solution is restricted to a ``feasible set'', according to professors' ad-hoc constraints depicted as $\Lambda^\text{P}$, intersected with lectures' ad-hoc constraints depicted as $\Lambda^\text{L}$.
+\begin{equation}
+    \xi \in \Lambda^\text{P} \cap \Lambda^\text{L}
+    \label{cnst:ad_hoc}
+\end{equation}
+
+% \vspace{1em}
+
+\subsubsection{Objectives}
+
+    Our approach seeks to minimize multiple objectives with different relevance. These objectives are established next, in order of decreasing relative importance.
+    
+    Equations (\ref{eq:obj_excep_timeslots_not_prac}) and  (\ref{eq:obj_excep_timeslots_prac}) define the number of exceptional time-slots used for non-practical lectures as $\excepNPracObj(u)$, and practical lectures as    $\excepPracObj(u)$, respectively.
+    % \green{Non-standard timeslot Usage}
+    \begin{equation}
+        \excepNPracObj(u) = \sum_{l \in \lectures \setminus \lectures^\text{P}} \sum_{d\in\days} \sum_{t \in \excepTimes_l} u_{l,(d,t)}
+        \label{eq:obj_excep_timeslots_not_prac}
+    \end{equation}
+    \begin{equation}
+        \excepPracObj(u) =\sum_{l\in\lectures^\text{P}} \sum_{d\in\days} \sum_{t\in\excepTimes_l} u_{l,(d,t)}
+        \label{eq:obj_excep_timeslots_prac}
+    \end{equation}
+    
+    Equation (\ref{eq:obj_elective_overlap}) sets $\electiveObj(u)$ as the schedule overlap between elective courses.
+    % \green{Elective Course Overlap}
+    \begin{equation}
+        \electiveObj(u) =\sum_{l_1\in\electives} \sum_{l_2\in\electives}\sum_{b\in\timeblocks} \overlap{l_1}{l_2}^\electives \cdot u_{l_1,b} \cdot u_{l_2,b}   
+        \label{eq:obj_elective_overlap}
+    \end{equation}
+
+    Equation (\ref{eq:obj_prof_days}) computes the number of weekly teaching days as $\daysObj(z)$ for professors who requested it.
+    % \green{Weekly Teaching Days}
+    \begin{equation}
+        \daysObj(z) =\sum_{p\in\profs^\text{D}} \sum_{d\in\days} z_{p,d}
+        \label{eq:obj_prof_days}
+    \end{equation}
+    
+    Equation (\ref{eq:obj_prefs}) defines $\prefObj(u,w)$ as the aggregate of the time-preference metric over all professor–timeblock pairs. Analogously to the preceding objective functions, this expression is minimized, which in this context corresponds to maximizing the overall satisfaction of the professors.
+    % \green{Professor timeslot Preferences}
+    \begin{equation}
+        \prefObj(u,w) = \sum_{p\in\profs} \sum_{b\in\timeblocks} \sum_{l\in\lectures} \preference_{p,b} \cdot w_{l,p} \cdot u_{l,b}
+        \label{eq:obj_prefs}
+    \end{equation}
+
+        
+
+    
+    % \begin{enumerate}
+    %     \item $\excepNPracObj(u)$: minimize the number of exceptional timeslots used for non-practical lectures, (\ref{eq:obj_excep_timeslots_not_prac})
+    %     \begin{equation}
+    %         \excepNPracObj(u) := \sum_{l \in \lectures \setminus \lectures^\text{P}} \sum_{d\in\days} \sum_{t \in \excepTimes_l} u_{l,b}
+    %         \label{eq:obj_excep_timeslots_not_prac}
+    %     \end{equation}
+            
+    %     \item $\excepPracObj(u)$: minimize the number of exceptional timeslots used for practical lectures, (\ref{eq:obj_excep_timeslots_prac})
+    %     \begin{equation}
+    %         \excepPracObj(u):=\sum_{l\in\lectures^\text{P}} \sum_{d\in\days} \sum_{t\in\excepTimes_l} u_{l,b}
+    %         \label{eq:obj_excep_timeslots_prac}
+    %     \end{equation}
+        
+    %     \item $\electiveObj(u)$: minimize schedule overlap between elective courses, (\ref{eq:obj_elective_overlap})
+    %     \begin{equation}
+    %         \electiveObj(u):=\sum_{l_1\in\electives} \sum_{l_2\in\electives}\sum_{b\in\timeblocks} \overlap{l_1}{l_2}^\electives \cdot u_{l_1,b} \cdot u_{l_2,b}   
+    %         \label{eq:obj_elective_overlap}
+    %     \end{equation}
+        
+        
+    %     \item $\daysObj(z)$: minimize the number of weekly teaching days for professors who requested it, (\ref{eq:obj_prof_days})
+    %     \begin{equation}
+    %         \daysObj(z):=\sum_{p\in\profs^\text{D}} \sum_{d\in\days} z_{p,d}
+    %         \label{eq:obj_prof_days}
+    %     \end{equation}
+        
+    %     \item $\prefObj(u,w)$: minimize the sum of the time-preference metric across all professor–timeblock pairs ---  thereby maximizing professors' satisfaction, (\ref{eq:obj_prefs}).
+    %     \begin{equation}
+    %         \prefObj(u,w) = \sum_{p\in\profs} \sum_{b\in\timeblocks} \sum_{l\in\lectures} \preference_{p,b} \cdot w_{l,p} \cdot u_{l,b}
+    %         \label{eq:obj_prefs}
+    %     \end{equation}
+        
+    % \end{enumerate}
+
+
+\vspace{1em}
+
+\subsubsection{Weighted-sum Objective Function}
+
+    % In summary, if $\xi=(u,v,w,x,y,z)$ represents a solution based on the values of all the variables, and $\Xi$ the solution space that satisfies all the constraints, the multi-objective problem can be expressed as Equation (\ref{eq:obj}:
+
+    In order to minimize all the objectives simultaneously, while taking into account their different relevance, the objective function of the formulation is expressed as a weighted sum of the objectives presented above.
+    Equation (\ref{eq:obj_weighted_sum}) depicts the overall objective function to be minimized, according to a weights vector $\lambda > 0$. Function arguments in the objectives are omitted for simplicity.
+    
+    \begin{equation}
+        \begin{split}
+            f(\xi)=\lambda_0 \cdot \excepNPracObj + \lambda_1 \cdot \excepPracObj + \lambda_2 \cdot \electiveObj + \lambda_3 \cdot \daysObj + \lambda_4 \cdot \prefObj \\
+            \quad 
+        \end{split}
+        \label{eq:obj_weighted_sum}
+    \end{equation}
+    % \begin{split}
+        %     \min \quad & \lambda_1^\text{nP} \cdot \excepNPracObj + \lambda_1^\text{P} \cdot \excepPracObj + \lambda_2 \cdot \electiveObj + \lambda_3 \cdot \daysObj + \lambda_4 \cdot \prefObj \\
+        %     \text{s.t.} \quad & \xi \in \Xi
+    % \end{split}
+
+    \subsection{Weighing the objectives}
+    
+    In practice, setting $\lambda:=(100,50,10,5,1)$ was an effective choice to achieve satisfactory quality of solutions for the timetable managers and academic coordinators. The definition of these weights is based on evaluating the cost of improving one objective at the expense of deteriorating the others. That is to say, the weights are set as relative costs between adjacent objectives, and it determines, for example, that it is preferable to reduce a teaching day ---improving the overall objective by $-5$--- even if it requires substituting a scheduled timeblock of preference 1 to another with preference 3 ---a cost of $3-1=2$---, as it implies an overall objective improvement of $2-5=-3$, and so on with the rest of objectives pairs.
+
+    % \begin{itemize}
+    %     \item Weighted sum of objectives in hierarchical order.
+    %         \[ 50 \cdot \text{ Exceptional timeslots } + 10 \cdot \text{ Elective overlaps}\]
+    %         \[ + 5 \cdot \text{ Teaching days } + 1 \cdot \text{ Preferences }\]
+
+    
+    Since the objectives are sorted by importance, the problem can be considered a lexicographic multi-objective one. This category of problems is typically addressed either by solving a sequence of linear programming models or by reformulating them into a single weighted objective function. The latter approach depends on carefully selecting the weights to ensure that the transformed single-objective problem remains equivalent to the original multi-objective formulation, as examined in~\cite{cococcioni2018lexicographic}.
+
+    It is important to highlight that the conditions imposed by the academic coordinators and timetable managers do not necessarily reflect a strict lexicographic order. For this reason, relative costs are defined, as imposing a minimum number of exceptional time-slots may excessively worsen the subsequent ``less important'' objectives.
+
+%%%%%% USAR EN FUTUROS ARTICULOS: %%%%%%%%%%%%%%%%%
+
+% \subsubsection{Lexicographic Order Weighting}
+
+%     To achieve a genuine lexicographic ordering, the following weighting rule is introduced. Each weight is set as $\lambda_i = 10^{d_{i+1}} \lambda_{i+1}$, and $\lambda_4=1$, where $d_i=\left\lceil \log_{10} \overline{f_i} \right\rceil$ is the number of digits of the upper bound of objective $f_i$ ---given minimization, and non-negative objectives---.
+
+%     As the objectives of the problem are all convex combinations of binary variables, then equation (\ref{eq:objectives_general_bounds}) holds for each objective $f_i(\xi^i)$, defined as a function of some binary variables $\xi^i\in\mathbb{B}^{n_i}$.
+%     \begin{equation}
+%         0 \leq f_i(\xi^i) \leq f_i(\mathbf{1}), \quad \forall \xi^i \in \mathbb{B}^{n_i}
+%         \label{eq:objectives_general_bounds}
+%     \end{equation}
+%     For this reason, an upper bound can be established for each objective as $\overline{f_i} :=f_i(\mathbf{1})$, detailed in equation (\ref{eq:obj_upper_bounds}), where $\mathbf{1}:=(1,1,\dots,1)$, and therefore $\lambda_i=10^{\left\lceil \log_{10}  f_{i+1}(\mathbf{1}) \right\rceil} \lambda_{i+1}$, $i=0,1,2,3$.
+    
+% \begin{equation}
+% \begin{split}
+%     & \overline{f_1} = \excepPracObj (\mathbf{1}) = |\days|\cdot \sum_{l\in\lectures^\text{P}}|\timeslots_l^E|  \\
+%     & \overline{f_2} = \electiveObj(\mathbf{1}) = |\timeblocks| \sum_{l_1\in\lectures}\sum_{l_2\in\lectures} \overlap{l_1}{l_2}^\electives \\
+%     & \overline{f_3} = \daysObj(\mathbf{1}) = |\days|\cdot|\profs^\text{D}| \\
+%     & \overline{f_4} = \prefObj(\mathbf{1}) = |\lectures| \sum_{p\in\profs} \sum_{b\in\timeblocks} \preference_{p,b} \\
+%     \quad
+% \end{split}
+% \label{eq:obj_upper_bounds}
+% \end{equation}

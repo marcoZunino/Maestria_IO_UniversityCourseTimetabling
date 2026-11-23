@@ -1,0 +1,166 @@
+\section{Quality Metrics}
+
+
+\textit{Extraido del paper de CLEI 2026, Results, Performance Metrics}
+    
+        To improve the evaluation of the quality of solutions, beyond the objective expressions of the MIP formulation, the following KPIs (Key Performance Indicators) are proposed. These metrics are useful for comparing the results between different solved instances that are subsequently presented. 
+        % \green {KPIs de los objetivos}
+
+        Upper bounds are considered for many expressions when defining these metrics. As depicted in equation (\ref{eq:objectives_general_bounds}), an upper bound equal to $g(\mathbf{1})$ can be established for any non-negative linear combination $g$ of $n$ binary variables $\xi$, where $\mathbf{1}:=(1,1,\dots,1)$.
+        \begin{equation}
+            0 \leq g(\xi) \leq g(\mathbf{1}), \quad \forall \xi \in \mathbb{B}^{n}
+            \label{eq:objectives_general_bounds}
+        \end{equation}
+
+        Performance metrics are defined as follows.
+    \vspace{1em}
+    \subsubsection{Exceptional Time-Slot Usage}
+
+        % \begin{equation}
+        %     \text{Excep. Times. Score } (x) := \frac{\sum_{g\in\groups}\sum_{d\in\days}\sum_{t\in\timeslots_{s_g}^E} x_{g,(d,t)}}{|\days|\sum_{g\in\groups}|\timeslots_{s_g}^E|}
+        %         \label{eq:excep_times_score}
+        % \end{equation}
+
+        The Exceptional Time-Slot Usage metric is defined in (\ref{eq:excep_times_score}), 
+        \begin{equation}
+            \text{Exceptional Time-Slot Usage } (x) \ := \ \frac{\varepsilon(x)}{\varepsilon(\mathbf{1})} \cdot 100\%
+            \label{eq:excep_times_score}
+        \end{equation}
+        where $\varepsilon(x)$ is the number of exceptional time-slots scheduled in a solution with group-timeblock assignment $x$, as depicted in (\ref{eq:excep_ts_x}). Therefore, $\varepsilon(\mathbf{1})$ represents the maximum possible number of exceptional time-slots that can be scheduled.
+        
+        \begin{equation}
+            \varepsilon(x) := \sum_{g \in \mathcal{G}} \sum_{d\in\mathcal{D}} \sum_{t \in \mathcal{T}_{s_g}^E} x_{g,(d,t)}
+            \label{eq:excep_ts_x}
+        \end{equation}
+
+        Unlike the objective expressions (\ref{eq:obj_excep_timeslots_not_prac}) and (\ref{eq:obj_excep_timeslots_prac}), this metric does not distinguish between practical and theoretical lectures, as it is formulated from the perspective of the student groups. 
+        
+        
+    \vspace{1em}
+    \subsubsection{Elective Overlap Score}
+
+        This metric evaluates elective lecture overlap, and is defined in (\ref{eq:elective_overlap_score}) as the ratio between the level of overlap of the solution $\electiveObj(u)$ ---as defined in equation (\ref{eq:obj_elective_overlap})--- and the trivial upper bound of that objective.
+        \begin{equation}
+            \text{Elective Overlap Score } (u) \ := \  \frac{\electiveObj(u)}{\electiveObj(\mathbf{1})} \cdot 100\%
+            \label{eq:elective_overlap_score}
+        \end{equation}
+        % where $\overline{\electiveObj}=\electiveObj(\mathbf{1})$.
+       
+    
+    \vspace{1em}
+    \subsubsection{Teaching Days Gap}
+
+        To evaluate the quality of a solution regarding the weekly teaching days objective $\daysObj(z)$, the Teaching Days Gap metric is defined in equation (\ref{eq:days_gap}), where $\underline{\daysObj}$ and $\overline{\daysObj}$ are a pair of lower and upper bounds for the $\daysObj(z)$ objective.
+        % \begin{framed}
+        \begin{equation}
+            \begin{split}
+                \text{Teaching Days Gap }(z) \ := \ \frac{\daysObj(z)-\underline{\daysObj}}{\overline{\daysObj}-\underline{\daysObj}} \cdot 100\%
+            \end{split}
+            \label{eq:days_gap}
+        \end{equation}
+        % \end{framed}
+        % The best and worst case scenarios for $\daysObj(z)$ are characterized by the minimum and maximum possible \textit{and feasible} number of days among all professors,
+        The bounds $\underline{\daysObj}$ and $\overline{\daysObj}$ are detailed in equations (\ref{eq:days_best_case}) and (\ref{eq:days_worst_case}), respectively, according to the number of lectures per professor.
+        \begin{equation}
+            \underline{\daysObj} :=\sum_{p\in\profs^\text{D}} \max_{l\in\lectures} \left\{ D_l:\ p \in \profs_l\right\}
+            \label{eq:days_best_case}
+        \end{equation}
+        \begin{equation}
+            \overline{\daysObj} :=\sum_{p\in\profs^\text{D}} \min \left\{5, \ \sum_{c\in\courses_p} \numLectures_{c,p} \cdot \max_{l\in\lectures_c} {D_l} \ \right\}
+            \label{eq:days_worst_case}
+        \end{equation}
+        Even though $0\leq \daysObj(z)\leq \daysObj(\mathbf{1})$, these narrower bounds $\underline{\daysObj} \leq \daysObj(z) \leq \overline{\daysObj}$ provide a more meaningful metric.
+
+
+
+        % The number of weekly teaching days of a solution defined by the variables $z$ follows from equation (\ref{eq:obj_prof_days}).
+        
+        % \vspace{2mm}
+        % \begin{minipage}{0.475\linewidth}
+        %   \begin{equation}
+        %     \daysObj(z) := \sum_{p\in\profs} \sum_{d\in\days} z_{p,d}
+        %     \label{eq:prof_days}
+        %   \end{equation}
+        % \end{minipage}
+        % \begin{minipage}{0.475\linewidth}
+        %   \begin{equation}
+        %     \underline{\daysObj} \leq \daysObj(z) \leq \overline{\daysObj}
+        %     \label{eq:prof_days_bound}
+        %   \end{equation}
+        % \end{minipage}
+        % \vspace{2mm}
+
+
+        % SCORE INDIVIDUAL POR PROFESOR    
+        % \begin{equation}
+        %     \underline{\daysObj_p} := \max_{l\in\lectures} \left\{ D_l:\ p \in \profs_l\right\}
+        %     \label{eq:prof_days_best_case}
+        % \end{equation}
+        
+        % \begin{equation}
+        %     \overline{\daysObj_p} := \min \left\{5, \ \sum_{c\in\courses_p} \numLectures_{c,p} \cdot \max_{l\in\lectures_c} {D_l} \ \right\}
+        %     \label{eq:prof_days_worst_case}
+        % \end{equation}
+
+        % \begin{equation}
+        %     \daysObj_p(z) = \sum_{d\in\days} z_{p,d}
+        % \end{equation}
+
+        % \vspace{2mm}
+        % \begin{minipage}{0.475\linewidth}
+        %   \begin{equation}
+        %     \underline{\daysObj} :=\sum_{p\in\profs} \underline{\daysObj_p}
+        %     \label{eq:days_best_case}
+        %   \end{equation}
+        % \end{minipage}
+        % %
+        % \begin{minipage}{0.475\linewidth}
+        %   \begin{equation}
+        %     \overline{\daysObj} :=\sum_{p\in\profs} \overline{\daysObj_p}
+        %     \label{eq:days_worst_case}
+        %   \end{equation}
+        % \end{minipage}
+        % \vspace{2mm}
+
+
+        % \vspace{2mm}
+        % \begin{minipage}{0.475\linewidth}
+        %   \begin{equation}
+        %     \daysObj(z) := \sum_{p\in\profs} \daysObj_p(z)
+        %     \label{eq:prof_days}
+        %   \end{equation}
+        % \end{minipage}
+        % %
+        % \begin{minipage}{0.475\linewidth}
+        %   \begin{equation}
+        %     \underline{\daysObj} \leq \daysObj(z) \leq \overline{\daysObj}
+        %     \label{eq:prof_days_bound}
+        %   \end{equation}
+        % \end{minipage}
+        % \vspace{2mm}
+
+    
+    \vspace{1em}
+    \subsubsection{Preference Fit Score}
+
+        The Preference Fit Score of a solution with professor-timeblock assignment $y$, is defined in (\ref{eq:pref_score}), where $\meanPref{y}$ is the mean preference value defined next.
+        \begin{equation}
+            \text{Preference Fit Score } (y) \ := \ \frac{\meanPref{\mathbf{1}}-\meanPref{y}}{\meanPref{\mathbf{1}}} \cdot 100\%
+            \label{eq:pref_score}
+        \end{equation}
+
+        This score measures the degree of fit between the solution and the professors' stated time-slot preferences. A larger score corresponds to a higher level of preference satisfaction.
+
+        The mean preference value $\meanPref{y} \in [1,3]$ of a solution is defined in (\ref{eq:mean_pref}) solely as a function of the $y$ variables, since this score evaluates preferences from the professors' point of view.
+        \begin{equation}
+            \meanPref{y} := \frac{\sum_{p\in\profs}\sum_{b\in\timeblocks} \preference_{p,b} \cdot y_{p,b}}{\sum_{p\in\profs}\sum_{b\in\timeblocks} (1-\preference^0_{p,b}) \cdot y_{p,b}}
+            \label{eq:mean_pref}
+        \end{equation}
+        
+        Then, the mean preference value across all input data (\ref{eq:input_mean_pref}) is $\meanPref{\mathbf{1}}$, as $\mathbf{1}$ represents a solution where all timeblocks are selected (\ref{eq:input_mean_pref}).
+        \begin{equation}
+            \meanPref{\mathbf{1}} = \frac{\sum_{p\in\profs}\sum_{b\in\timeblocks} \preference_{p,b}}{|\profs|\cdot|\timeblocks|-\sum_{p\in\profs}\sum_{b\in\timeblocks} \preference^0_{p,b}}
+            \label{eq:input_mean_pref}
+        \end{equation}
+
+\vspace{1em}

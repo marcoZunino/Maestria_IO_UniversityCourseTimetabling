@@ -1,0 +1,62 @@
+
+\section{Context}
+
+
+The context of this thesis is the University Course Timetabling Problem (UCTP), which is a well-known combinatorial optimization problem. The UCTP involves scheduling a set of courses, instructors, and students into a limited number of time slots and rooms while satisfying various constraints. The goal is to create a timetable that optimizes certain objectives, such as minimizing conflicts, maximizing preferences, and ensuring fairness.
+
+
+\textit{Extraido del paper de CLEI 2026}
+
+% introduccion general de la tematica y motivacion
+Timetable design is an essential activity in all educational institutions.
+In small settings, it can often be managed manually~\cite{chavez2020modeling};
+however, as student enrolment increases —consequently, the volume of teaching hours to be scheduled—
+the task becomes much more complex and difficult,
+making it impossible to manage without the use of computer-assisted methods. 
+Although no universally accepted taxonomy exists for the problem of assigning activities to time-slots in educational institutions,
+this study adopts the term University Course Timetabling Problem (UCTTP), following~\cite{schaerf1999survey}.
+The automation of educational timetabling has been studied since the work of C. C. Gotlieb, 1963,
+where the problem was first formally defined in terms of a set of teachers, classrooms, and time-slots~\cite{gotlieb1963}.
+
+% proposal
+The present work focuses on a variant of the UCTTP problem, 
+which involves the simultaneous allocation of time-slots and professors to a set of courses, 
+with particular emphasis on professors' availability and temporal preferences.
+% extension
+This work extends a previous study~\cite{zunino2024automated}, motivated by recent and recurring changes in the university case study: increasing number of courses, professors, and students, and the need of including new course formats.
+
+% extended instances
+While the earlier study served primarily as a proof of concept, 
+limited to synthetic instances that were relatively small in scale and lacked the diversity of real-world data, the present work advances the approach by incorporating instances of greater size and detail.
+Both studies are motivated by a real-world application at the Universidad de Montevideo, 
+specifically within its Faculty of Engineering (FIUM). 
+Since 2024, the model has been progressively refined to incorporate additional levels of detail, culminating in the formulation presented in this paper.
+
+% esto no va
+% Both contributions adopt the classical theory-to-practice structure, in which some lectures are classified as theoretical or practical. Each practical lecture is associated with a unique theoretical counterpart.
+
+% formulation / extension
+% This paper extends the mathematical formulation by incorporating elective courses, allowing flexibility to include exceptional time-slots, and introducing objectives aimed at minimizing the number of teaching days per professor. Finally, it extends the initial proof of concept to cover all courses offered at FIUM, accounting for actual time-slot preferences from professors.
+
+% formulation
+The primary object of this work is to present a formulation of a Mixed-Integer Programming (MIP) model 
+that captures the full complexity of the problem.
+A central feature of the formulation is its time-slot structure: 
+days are partitioned into atomic time-slots that can be concatenated to accommodate lectures of varying duration, and subsequently grouped into shifts according to the period of the day.
+The introduction of lecture hour consecutiveness constraints establishes that lectures cannot be scheduled on consecutive days but must occupy contiguous time-slots within the same day. This flexibility, however, entails increased model complexity and greater computational effort in solving the resulting instances.
+Moreover, the problem is reformulated as a multi-objective optimization task that seeks to minimize:
+(i) the use of exceptional time-slots that overflow from standard schedule shifts,
+(ii) scheduling overlaps among elective courses, 
+and (iii) the number of teaching days per week per professor, 
+in addition to the original objective of maximizing preferences for standard time-slots throughout the schedule.
+
+
+
+% results
+With respect to solution methods, 
+the optimization is carried out using the commercial solver Gurobi~\cite{gurobi}, 
+consistent with the approach adopted in~\cite{zunino2024automated}.
+This work validates the practical applicability of an exact solver in a real-world setting and discusses the main challenges encountered in the design and deployment of the system. Obtained solutions of the instances were successfully applied at FIUM.
+
+The proposed exact method has proven effective in addressing infeasibilities arising from inconsistencies in the input data or from incompatible time-availability constraints across lectures. In such situations, the causes of infeasibility are identified by solving reduced problem instances, which enables the underlying source of the conflict to be isolated. This human-in-the-loop optimization process requires targeted intervention to adjust the input data before the solver can successfully produce a feasible solution.
+
